@@ -16,6 +16,7 @@ services:
       - DEFAULT_ADMIN_PHONE=${DEFAULT_ADMIN_PHONE}
       - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD}
       - DEFAULT_ADMIN_NAME=${DEFAULT_ADMIN_NAME}
+      - REDIS_URL=${REDIS_URL}
     networks:
       - app-network
       # Connects to the host Traefik network

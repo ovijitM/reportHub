@@ -16,6 +16,7 @@ import dailyOrdersRouter from './routes/dailyOrders.js';
 import fieldVisitsRouter from './routes/fieldVisits.js';
 import adminRouter from './routes/admin.js';
 import pdfRouter from './routes/pdf.js';
+import { connectRedis } from './services/cache.js';
 
 dotenv.config();
 
@@ -86,6 +87,7 @@ mongoose.connect(MONGO_URI)
   .then(async () => {
     console.log('Successfully connected to MongoDB.');
     await seedAdmin();
+    await connectRedis();
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });

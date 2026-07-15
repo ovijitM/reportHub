@@ -7,6 +7,7 @@ import DailyWorksEntry from '../models/DailyWorksEntry.js';
 import DailyOrderEntry from '../models/DailyOrderEntry.js';
 import FieldVisitEntry from '../models/FieldVisitEntry.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
+import { getCache, setCache, delCache, delCachePattern } from '../services/cache.js';
 
 const router = express.Router();
 
@@ -19,7 +20,14 @@ const requireManagerOrAdmin = requireRole(['manager', 'admin']);
 // 1. GET all agents (staff role)
 router.get('/agents', requireManagerOrAdmin, async (req, res) => {
   try {
+    const cacheKey = 'agents:all';
+    const cachedAgents = await getCache(cacheKey);
+    if (cachedAgents) {
+      return res.json(cachedAgents);
+    }
+
     const agents = await User.find({ role: 'staff' }).sort({ name: 1 });
+    await setCache(cacheKey, agents, 3600);
     res.json(agents);
   } catch (error) {
     console.error('Fetch agents error:', error);
@@ -52,6 +60,8 @@ router.post('/agents', requireManagerOrAdmin, async (req, res) => {
     });
 
     await newUser.save();
+    await delCache('agents:all');
+    await delCachePattern('overview:*');
     res.status(201).json({
       id: newUser._id,
       name: newUser.name,
@@ -93,6 +103,8 @@ router.put('/agents/:id', requireManagerOrAdmin, async (req, res) => {
     }
 
     await user.save();
+    await delCache('agents:all');
+    await delCachePattern('overview:*');
     res.json({
       id: user._id,
       name: user.name,
@@ -161,6 +173,7 @@ router.put('/staff-monthly-config/:staffId/:month/:year', requireManagerOrAdmin,
 
     const options = { new: true, upsert: true, setDefaultsOnInsert: true };
     const config = await StaffMonthlyConfig.findOneAndUpdate(filter, update, options);
+    await delCache(`overview:${month}:${year}`);
 
     res.json(config);
   } catch (error) {
@@ -172,7 +185,14 @@ router.put('/staff-monthly-config/:staffId/:month/:year', requireManagerOrAdmin,
 // 5. GET/POST shared master market list
 router.get('/markets', async (req, res) => {
   try {
+    const cacheKey = 'markets:all';
+    const cachedMarkets = await getCache(cacheKey);
+    if (cachedMarkets) {
+      return res.json(cachedMarkets);
+    }
+
     const markets = await Market.find().sort({ name: 1 });
+    await setCache(cacheKey, markets, 3600);
     res.json(markets);
   } catch (error) {
     console.error('Fetch markets error:', error);
@@ -197,6 +217,7 @@ router.post('/markets', requireManagerOrAdmin, async (req, res) => {
       area: area ? area.trim() : ''
     });
     await market.save();
+    await delCache('markets:all');
     res.status(201).json(market);
   } catch (error) {
     console.error('Create market error:', error);
@@ -219,6 +240,7 @@ router.put('/markets/:id', requireManagerOrAdmin, async (req, res) => {
     if (area !== undefined) market.area = area.trim();
 
     await market.save();
+    await delCache('markets:all');
     res.json(market);
   } catch (error) {
     console.error('Update market error:', error);
@@ -235,6 +257,7 @@ router.delete('/markets/:id', requireManagerOrAdmin, async (req, res) => {
     if (!market) {
       return res.status(404).json({ error: 'Market not found' });
     }
+    await delCache('markets:all');
     res.json({ message: 'Market deleted successfully' });
   } catch (error) {
     console.error('Delete market error:', error);
@@ -249,6 +272,12 @@ router.get('/overview', requireManagerOrAdmin, async (req, res) => {
   const year = parseInt(req.query.year || new Date().getFullYear(), 10);
 
   try {
+    const cacheKey = `overview:${month}:${year}`;
+    const cachedOverview = await getCache(cacheKey);
+    if (cachedOverview) {
+      return res.json(cachedOverview);
+    }
+
     // 1. Get all active staff
     const agents = await User.find({ role: 'staff', isActive: true });
 
@@ -303,6 +332,7 @@ router.get('/overview', requireManagerOrAdmin, async (req, res) => {
       };
     }));
 
+    await setCache(cacheKey, overviewData, 3600);
     res.json(overviewData);
   } catch (error) {
     console.error('Overview aggregation error:', error);

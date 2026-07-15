@@ -1,6 +1,7 @@
 import express from 'express';
 import DailyOrderEntry from '../models/DailyOrderEntry.js';
 import { authenticateToken } from '../middleware/auth.js';
+import { delCache } from '../services/cache.js';
 
 const router = express.Router();
 const LOCK_WINDOW_DAYS = parseInt(process.env.LOCK_WINDOW_DAYS || '7', 10);
@@ -55,6 +56,10 @@ router.post('/', authenticateToken, async (req, res) => {
 
     const options = { new: true, upsert: true, setDefaultsOnInsert: true };
     const entry = await DailyOrderEntry.findOneAndUpdate(filter, update, options);
+
+    const month = entryDate.getUTCMonth() + 1;
+    const year = entryDate.getUTCFullYear();
+    await delCache(`overview:${month}:${year}`);
 
     res.json(entry);
   } catch (error) {
@@ -120,6 +125,12 @@ router.put('/:id', authenticateToken, async (req, res) => {
     }
 
     await entry.save();
+
+    const d = new Date(entry.date);
+    const month = d.getUTCMonth() + 1;
+    const year = d.getUTCFullYear();
+    await delCache(`overview:${month}:${year}`);
+
     res.json(entry);
   } catch (error) {
     console.error('Update Daily Order entry error:', error);

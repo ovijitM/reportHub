@@ -19,13 +19,13 @@ services:
     container_name: allen-pharma-app
     restart: always
     environment:
-      - PORT=5000
-      - MONGO_URI=mongodb://mongo:27017/allen-pharma
-      - JWT_SECRET=jupiter_allen_pharma_secret_key_2026
-      - LOCK_WINDOW_DAYS=7
-      - DEFAULT_ADMIN_PHONE=01700000000
-      - DEFAULT_ADMIN_PASSWORD=adminpassword
-      - DEFAULT_ADMIN_NAME=Admin Supervisor
+      - PORT=${PORT:-5000}
+      - MONGO_URI=${MONGO_URI:-mongodb://mongo:27017/allen-pharma}
+      - JWT_SECRET=${JWT_SECRET:-jupiter_allen_pharma_secret_key_2026}
+      - LOCK_WINDOW_DAYS=${LOCK_WINDOW_DAYS:-7}
+      - DEFAULT_ADMIN_PHONE=${DEFAULT_ADMIN_PHONE:-01700000000}
+      - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD:-adminpassword}
+      - DEFAULT_ADMIN_NAME=${DEFAULT_ADMIN_NAME:-Admin Supervisor}
     depends_on:
       - mongo
     networks:

@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  # Main Application Service (Serves API + Frontend assets together)
-  app:
+  # Backend API Service
+  backend:
     build:
-      context: .
-      dockerfile: ./backend/Dockerfile
-    container_name: allen-pharma-app
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: allen-pharma-backend
     restart: always
     environment:
       - PORT=${PORT:-5000}
@@ -19,22 +19,34 @@ services:
       - REDIS_URL=${REDIS_URL}
     networks:
       - app-network
-      # Connects to the host Traefik network
       - web
-    
-    # Exposes port for local running (uncomment 'ports' if running without a reverse proxy)
-    # ports:
-    #   - "5000:5000"
-
+    depends_on:
+      - redis
     labels:
       - "traefik.enable=true"
-      # REPLACE fieldsheets.yourdomain.com with your actual domain
-      - "traefik.http.routers.allen-pharma.rule=Host(`stuffreport.rakibroki.tech`)"
-      - "traefik.http.routers.allen-pharma.entrypoints=websecure"
-      - "traefik.http.routers.allen-pharma.tls=true"
-      # Uses the VPS's configured Let's Encrypt resolver (change name if necessary)
-      - "traefik.http.routers.allen-pharma.tls.certresolver=letsencrypt"
-      - "traefik.http.services.allen-pharma.loadbalancer.server.port=5000"
+      - "traefik.http.routers.allen-pharma-backend.rule=Host(`stuffreport.rakibroki.tech`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.allen-pharma-backend.entrypoints=websecure"
+      - "traefik.http.routers.allen-pharma-backend.tls=true"
+      - "traefik.http.routers.allen-pharma-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.allen-pharma-backend.loadbalancer.server.port=5000"
+
+  # Frontend Static Asset Service (Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: allen-pharma-frontend
+    restart: always
+    networks:
+      - app-network
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.allen-pharma-frontend.rule=Host(`stuffreport.rakibroki.tech`)"
+      - "traefik.http.routers.allen-pharma-frontend.entrypoints=websecure"
+      - "traefik.http.routers.allen-pharma-frontend.tls=true"
+      - "traefik.http.routers.allen-pharma-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.allen-pharma-frontend.loadbalancer.server.port=80"
 
   # Internal Redis Cache (Private, no public ports exposed)
   redis:

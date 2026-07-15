@@ -1,12 +1,3 @@
-# Stage 1: Build the React frontend
-FROM node:20-slim AS frontend-builder
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm install
-COPY frontend/ ./
-RUN npm run build
-
-# Stage 2: Create the production server image
 FROM node:20-slim
 
 # Install system dependencies for Puppeteer and Chromium
@@ -34,17 +25,12 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 WORKDIR /app
 
 # Copy backend dependencies
-COPY backend/package*.json ./backend/
-WORKDIR /app/backend
+COPY package*.json ./
 RUN npm install --only=production
 
 # Copy backend source code
-COPY backend/ ./
-
-# Copy built frontend assets from builder stage
-COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
+COPY . .
 
 EXPOSE 5000
 
 CMD ["npm", "start"]
-

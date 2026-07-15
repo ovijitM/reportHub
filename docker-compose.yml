@@ -33,7 +33,7 @@ services:
       - "traefik.http.routers.allen-pharma.entrypoints=websecure"
       - "traefik.http.routers.allen-pharma.tls=true"
       # Uses the VPS's configured Let's Encrypt resolver (change name if necessary)
-      - "traefik.http.routers.allen-pharma.tls.certresolver=myresolver"
+      - "traefik.http.routers.allen-pharma.tls.certresolver=letsencrypt"
       - "traefik.http.services.allen-pharma.loadbalancer.server.port=5000"
 
 networks:

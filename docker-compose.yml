@@ -36,6 +36,20 @@ services:
       - "traefik.http.routers.allen-pharma.tls.certresolver=letsencrypt"
       - "traefik.http.services.allen-pharma.loadbalancer.server.port=5000"
 
+  # Internal Redis Cache (Private, no public ports exposed)
+  redis:
+    image: redis:alpine
+    container_name: allen-pharma-redis
+    command: redis-server --save 60 1 --loglevel warning --requirepass ${REDIS_PASSWORD:-123456}
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+
 networks:
   app-network:
     driver: bridge

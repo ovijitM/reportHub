@@ -1,0 +1,29 @@
+# Refactor Tasks
+
+- [x] Read full App.jsx
+- [x] Create components/ProtectedRoute.jsx
+- [x] Create components/MarketSelect.jsx
+- [x] Create components/StepperInput.jsx
+- [x] Create pages/LoginPage.jsx
+- [x] Create pages/mpo/MPOHomePage.jsx
+- [x] Create pages/mpo/Sheet1Form.jsx
+- [x] Create pages/mpo/Sheet2Form.jsx
+- [x] Create pages/mpo/Sheet3Form.jsx
+- [x] Create pages/admin/AdminDashboard.jsx
+- [x] Create pages/admin/AdminOverview.jsx
+- [x] Create pages/admin/AdminMPOAccounts.jsx
+- [x] Create pages/admin/AdminMonthlyConfigs.jsx
+- [x] Create pages/admin/AdminMasterMarkets.jsx
+- [x] Rewrite App.jsx as slim router
+- [x] Add MPO Staff PDF download feature
+- [x] Convert MarketSelect to checkbox-based multi-selector (A+B joining)
+- [x] Implement full mobile responsiveness (collapsible admin grids & wrapper headers)
+- [x] Fix mobile select/option font size to prevent microscopic text in picker overlay
+- [x] Implement responsive Table-to-List layout swap for MPO Accounts lists on mobile
+- [x] Design and apply Area-Market hierarchical link (Backend schema + auto-filtering configs UI)
+- [x] Redesign Master Markets as collapsible Area Database with bulk registration support
+- [x] Add inline Edit and Delete options for markets/areas in Area Database
+- [x] Run database patch script to group unassigned markets into the Nasirnagar Area
+- [x] Convert Area Name input in Monthly Targets config page to a Select-or-Create dropdown
+- [x] Configure strict Area-specific market filtering (only show matching parent Area markets)
+- [x] npm run build — verify zero errors

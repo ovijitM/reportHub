@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # Persisted Database Service
+  mongo:
+    image: mongo:6.0
+    container_name: allen-pharma-mongo
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+  # Main Application Service (Serves API + Frontend assets together)
+  app:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: allen-pharma-app
+    restart: always
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/allen-pharma
+      - JWT_SECRET=jupiter_allen_pharma_secret_key_2026
+      - LOCK_WINDOW_DAYS=7
+      - DEFAULT_ADMIN_PHONE=01700000000
+      - DEFAULT_ADMIN_PASSWORD=adminpassword
+      - DEFAULT_ADMIN_NAME=Admin Supervisor
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+      # Connects to the host Traefik network
+      - web
+    
+    # Exposes port for local running (uncomment 'ports' if running without a reverse proxy)
+    # ports:
+    #   - "5000:5000"
+
+    labels:
+      - "traefik.enable=true"
+      # REPLACE fieldsheets.yourdomain.com with your actual domain
+      - "traefik.http.routers.allen-pharma.rule=Host(`stuffreport.rakibroki.tech`)"
+      - "traefik.http.routers.allen-pharma.entrypoints=websecure"
+      - "traefik.http.routers.allen-pharma.tls=true"
+      # Uses the VPS's configured Let's Encrypt resolver (change name if necessary)
+      - "traefik.http.routers.allen-pharma.tls.certresolver=myresolver"
+      - "traefik.http.services.allen-pharma.loadbalancer.server.port=5000"
+
+volumes:
+  mongo-data:
+
+networks:
+  app-network:
+    driver: bridge
+  
+  # External network where Traefik proxy resides.
+  # Ensure you create it first using 'docker network create web' if testing locally.
+  web:
+    external: true

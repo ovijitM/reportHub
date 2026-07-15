@@ -10,12 +10,12 @@ services:
     restart: always
     environment:
       - PORT=${PORT:-5000}
-      - MONGO_URI=${MONGO_URI:-mongodb://ovijit:Moumitaovi123!@92.242.187.122:32805/allen-pharma?authSource=admin}
-      - JWT_SECRET=${JWT_SECRET:-jupiter_allen_pharma_secret_key_2026}
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
       - LOCK_WINDOW_DAYS=${LOCK_WINDOW_DAYS:-7}
-      - DEFAULT_ADMIN_PHONE=${DEFAULT_ADMIN_PHONE:-01700000000}
-      - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD:-adminpassword}
-      - DEFAULT_ADMIN_NAME=${DEFAULT_ADMIN_NAME:-Admin Supervisor}
+      - DEFAULT_ADMIN_PHONE=${DEFAULT_ADMIN_PHONE}
+      - DEFAULT_ADMIN_PASSWORD=${DEFAULT_ADMIN_PASSWORD}
+      - DEFAULT_ADMIN_NAME=${DEFAULT_ADMIN_NAME}
     networks:
       - app-network
       # Connects to the host Traefik network

@@ -2,7 +2,7 @@ import { createClient } from 'redis';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://:123456@69.62.75.165:32769';
+const REDIS_URL = process.env.REDIS_URL || 'redis://:123456@69.62.75.165:32768';
 
 let redisClient = null;
 

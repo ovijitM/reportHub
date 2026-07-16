@@ -295,24 +295,24 @@ export const generateDailyOrdersPDF = async (staff, config, month, year, entries
       },
       {
         columns: [
-          {
-            width: '60%',
-            stack: [
-              { text: 'FINANCIAL PERFORMANCE SUMMARY', style: 'sectionTitle', margin: [0, 10, 0, 5] },
-              {
-                table: {
-                  widths: [150, '*'],
-                  body: [
-                    [ { text: 'Monthly Target (TK):', bold: true }, { text: `${target.toLocaleString()}` } ],
-                    [ { text: 'Total Collections (TK):', bold: true }, { text: `${totalCollection.toLocaleString()}` } ],
-                    [ { text: 'Variance (TK):', bold: true }, { text: `${variance >= 0 ? '+' : ''}${variance.toLocaleString()}`, color: variance >= 0 ? '#2F6D4F' : '#B5502F' } ],
-                    [ { text: 'Target Progress (%):', bold: true }, { text: `${progressPct.toFixed(1)}%` } ]
-                  ]
-                },
-                layout: 'noBorders'
-              }
-            ]
-          },
+          // {
+          //   width: '60%',
+          //   stack: [
+          //     { text: 'FINANCIAL PERFORMANCE SUMMARY', style: 'sectionTitle', margin: [0, 10, 0, 5] },
+          //     {
+          //       table: {
+          //         widths: [150, '*'],
+          //         body: [
+          //           [ { text: 'Monthly Target (TK):', bold: true }, { text: `${target.toLocaleString()}` } ],
+          //           [ { text: 'Total Collections (TK):', bold: true }, { text: `${totalCollection.toLocaleString()}` } ],
+          //           [ { text: 'Variance (TK):', bold: true }, { text: `${variance >= 0 ? '+' : ''}${variance.toLocaleString()}`, color: variance >= 0 ? '#2F6D4F' : '#B5502F' } ],
+          //           [ { text: 'Target Progress (%):', bold: true }, { text: `${progressPct.toFixed(1)}%` } ]
+          //         ]
+          //       },
+          //       layout: 'noBorders'
+          //     }
+          //   ]
+          // },
           {
             width: '40%',
             stack: [

@@ -118,6 +118,40 @@ router.put('/agents/:id', requireManagerOrAdmin, async (req, res) => {
   }
 });
 
+// 3a. DELETE an agent account and cascade delete their related records
+router.delete('/agents/:id', requireManagerOrAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (user.role !== 'staff') {
+      return res.status(400).json({ error: 'Only MPO agent accounts can be deleted' });
+    }
+
+    // Cascade delete related documents
+    await DailyWorksEntry.deleteMany({ staffId: id });
+    await DailyOrderEntry.deleteMany({ staffId: id });
+    await FieldVisitEntry.deleteMany({ staffId: id });
+    await StaffMonthlyConfig.deleteMany({ staffId: id });
+
+    // Finally delete the user
+    await User.findByIdAndDelete(id);
+
+    // Clear caches
+    await delCache('agents:all');
+    await delCachePattern('overview:*');
+
+    res.json({ message: 'Agent account and all related data deleted successfully' });
+  } catch (error) {
+    console.error('Delete agent error:', error);
+    res.status(500).json({ error: 'Failed to delete agent account' });
+  }
+});
+
 // 4. GET or PUT Staff Monthly Config
 router.get('/staff-monthly-config/:staffId/:month/:year', async (req, res) => {
   const { staffId, month, year } = req.params;

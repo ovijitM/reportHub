@@ -53,6 +53,17 @@ export default function AdminMPOAccounts() {
     }
   };
 
+  const handleDelete = async (id, name) => {
+    if (window.confirm(`Are you sure you want to permanently delete the account for ${name}? This action cannot be undone and will delete all associated logs.`)) {
+      try {
+        await apiAdmin.deleteAgent(id);
+        loadAgents();
+      } catch (err) {
+        alert('Deletion failed: ' + err.message);
+      }
+    }
+  };
+
   return (
     <div className="admin-grid-2-1">
       <div className="card">
@@ -89,13 +100,22 @@ export default function AdminMPOAccounts() {
                         </span>
                       </td>
                       <td style={{ textAlign: 'center' }}>
-                        <button
-                          onClick={() => handleDeactivate(agent._id, agent.isActive)}
-                          className={`btn ${agent.isActive ? 'btn-danger' : 'btn-secondary'}`}
-                          style={{ minHeight: 28, padding: '4px 10px', fontSize: 12 }}
-                        >
-                          {agent.isActive ? 'Deactivate' : 'Reactivate'}
-                        </button>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                          <button
+                            onClick={() => handleDeactivate(agent._id, agent.isActive)}
+                            className={`btn ${agent.isActive ? 'btn-danger' : 'btn-secondary'}`}
+                            style={{ minHeight: 28, padding: '4px 10px', fontSize: 12 }}
+                          >
+                            {agent.isActive ? 'Deactivate' : 'Reactivate'}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(agent._id, agent.name)}
+                            className="btn btn-danger"
+                            style={{ minHeight: 28, padding: '4px 10px', fontSize: 12 }}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -112,21 +132,32 @@ export default function AdminMPOAccounts() {
                       <div style={{ fontWeight: 600, fontSize: 15, color: '#1F4D37' }}>{agent.name}</div>
                       <div className="mono caption" style={{ marginTop: 2 }}>{agent.phone}</div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span style={{
-                        fontSize: 11, padding: '3px 8px', borderRadius: 4,
-                        backgroundColor: agent.isActive ? 'rgba(47,109,79,0.1)' : 'rgba(181,80,47,0.1)',
-                        color: agent.isActive ? '#2F6D4F' : '#B5502F',
-                      }}>
-                        {agent.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                      <button
-                        onClick={() => handleDeactivate(agent._id, agent.isActive)}
-                        className={`btn ${agent.isActive ? 'btn-danger' : 'btn-secondary'}`}
-                        style={{ minHeight: 28, padding: '3px 8px', fontSize: 11 }}
-                      >
-                        {agent.isActive ? 'Deactivate' : 'Reactivate'}
-                      </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{
+                          fontSize: 11, padding: '3px 8px', borderRadius: 4,
+                          backgroundColor: agent.isActive ? 'rgba(47,109,79,0.1)' : 'rgba(181,80,47,0.1)',
+                          color: agent.isActive ? '#2F6D4F' : '#B5502F',
+                        }}>
+                          {agent.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button
+                          onClick={() => handleDeactivate(agent._id, agent.isActive)}
+                          className={`btn ${agent.isActive ? 'btn-danger' : 'btn-secondary'}`}
+                          style={{ minHeight: 28, padding: '3px 8px', fontSize: 11 }}
+                        >
+                          {agent.isActive ? 'Deactivate' : 'Reactivate'}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(agent._id, agent.name)}
+                          className="btn btn-danger"
+                          style={{ minHeight: 28, padding: '3px 8px', fontSize: 11 }}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

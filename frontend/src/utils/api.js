@@ -117,6 +117,9 @@ export const apiAdmin = {
   updateAgent: async (id, data) => {
     return await apiRequest(`/api/admin/agents/${id}`, 'PUT', data);
   },
+  deleteAgent: async (id) => {
+    return await apiRequest(`/api/admin/agents/${id}`, 'DELETE');
+  },
   getMonthlyConfig: async (staffId, month, year) => {
     return await apiRequest(`/api/admin/staff-monthly-config/${staffId}/${month}/${year}`);
   },

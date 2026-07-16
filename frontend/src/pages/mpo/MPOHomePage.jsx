@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, RefreshCw, ChevronRight, CheckCircle2, Download } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ChevronRight, CheckCircle2, Download, Eye } from 'lucide-react';
 import { apiAuth, apiAgent, apiPDF } from '../../utils/api';
 import { getDraft } from '../../utils/db';
 
@@ -16,17 +16,23 @@ export default function MPOHomePage() {
   const [pdfMonth, setPdfMonth] = useState(new Date().getMonth() + 1);
   const [pdfYear, setPdfYear] = useState(new Date().getFullYear());
 
-  const handleDownloadPDF = async (sheetType) => {
+  const handlePDFAction = async (sheetType, action) => {
     if (!currentUser) return;
     try {
       const blob = await apiPDF.downloadSheet(sheetType, currentUser.id, pdfMonth, pdfYear);
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${sheetType}_${currentUser.name.replace(/\s+/g, '_')}_${pdfMonth}_${pdfYear}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
+      const file = new Blob([blob], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(file);
+      
+      if (action === 'view') {
+        window.open(url, '_blank');
+      } else {
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${sheetType}_${currentUser.name.replace(/\s+/g, '_')}_${pdfMonth}_${pdfYear}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+      }
     } catch (err) {
       alert('Failed to generate PDF: ' + err.message);
     }
@@ -201,16 +207,75 @@ export default function MPOHomePage() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <button onClick={() => handleDownloadPDF('daily-works')} className="btn btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, minHeight: 38 }}>
-            <Download size={16} /> Sheet 1 (Daily Works) PDF
-          </button>
-          <button onClick={() => handleDownloadPDF('daily-orders')} className="btn btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, minHeight: 38 }}>
-            <Download size={16} /> Sheet 2 (Order &amp; Collection) PDF
-          </button>
-          <button onClick={() => handleDownloadPDF('field-visits')} className="btn btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, minHeight: 38 }}>
-            <Download size={16} /> Sheet 3 (Field Visits) PDF
-          </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
+          {/* Sheet 1 */}
+          <div style={{ borderBottom: '1px dashed #FAF7F0', paddingBottom: 12 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#1F4D37', marginBottom: 8 }}>
+              Sheet 1: Daily Works
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button 
+                onClick={() => handlePDFAction('daily-works', 'view')} 
+                className="btn btn-secondary" 
+                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, minHeight: 38, fontSize: 13, padding: '6px 12px' }}
+              >
+                <Eye size={15} /> View Online
+              </button>
+              <button 
+                onClick={() => handlePDFAction('daily-works', 'download')} 
+                className="btn btn-primary" 
+                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, minHeight: 38, fontSize: 13, padding: '6px 12px' }}
+              >
+                <Download size={15} /> Download
+              </button>
+            </div>
+          </div>
+          
+          {/* Sheet 2 */}
+          <div style={{ borderBottom: '1px dashed #FAF7F0', paddingBottom: 12 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#1F4D37', marginBottom: 8 }}>
+              Sheet 2: Order &amp; Collection
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button 
+                onClick={() => handlePDFAction('daily-orders', 'view')} 
+                className="btn btn-secondary" 
+                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, minHeight: 38, fontSize: 13, padding: '6px 12px' }}
+              >
+                <Eye size={15} /> View Online
+              </button>
+              <button 
+                onClick={() => handlePDFAction('daily-orders', 'download')} 
+                className="btn btn-primary" 
+                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, minHeight: 38, fontSize: 13, padding: '6px 12px' }}
+              >
+                <Download size={15} /> Download
+              </button>
+            </div>
+          </div>
+
+          {/* Sheet 3 */}
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#1F4D37', marginBottom: 8 }}>
+              Sheet 3: Field Visits
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button 
+                onClick={() => handlePDFAction('field-visits', 'view')} 
+                className="btn btn-secondary" 
+                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, minHeight: 38, fontSize: 13, padding: '6px 12px' }}
+              >
+                <Eye size={15} /> View Online
+              </button>
+              <button 
+                onClick={() => handlePDFAction('field-visits', 'download')} 
+                className="btn btn-primary" 
+                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, minHeight: 38, fontSize: 13, padding: '6px 12px' }}
+              >
+                <Download size={15} /> Download
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

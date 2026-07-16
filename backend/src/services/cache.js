@@ -7,6 +7,11 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://:123456@69.62.75.165:32768';
 let redisClient = null;
 
 export const connectRedis = async () => {
+  if (process.env.SKIP_REDIS === 'true') {
+    console.log('Skipping Redis connection for local development.');
+    redisClient = null;
+    return;
+  }
   try {
     redisClient = createClient({ url: REDIS_URL });
     redisClient.on('error', (err) => console.error('Redis Client Error:', err));
